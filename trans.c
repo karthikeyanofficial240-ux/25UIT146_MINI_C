@@ -5,6 +5,8 @@
 #include <stdlib.h>
 
 #define MAX_RECORDS 100
+#define DATA_FILE "credit.dat"
+#define TEXT_FILE "accounts.txt"
 
 // clientData structure definition
 struct clientData
@@ -28,10 +30,10 @@ int main(int argc, char *argv[])
     unsigned int choice; // user's choice
 
     // fopen opens the file; exits if file cannot be opened
-    if ((cfPtr = fopen("credit.dat", "rb+")) == NULL)
+    if ((cfPtr = fopen(DATA_FILE, "rb+")) == NULL)
     {
         // if file does not exist, create it
-        if ((cfPtr = fopen("credit.dat", "wb+")) == NULL) {
+        if ((cfPtr = fopen(DATA_FILE, "wb+")) == NULL) {
             printf("%s: File could not be opened.\n", argv[0]);
             exit(-1);
         }
@@ -73,18 +75,18 @@ int main(int argc, char *argv[])
     }     // end while
 
     fclose(cfPtr); // fclose closes the file
+    return 0;
 } // end main
 
 // create formatted text file for printing
 void textFile(FILE *readPtr)
 {
     FILE *writePtr; // accounts.txt file pointer
-    size_t result;  // used to test whether fread read any bytes
     // create clientData with default information
     struct clientData client = {0, "", "", 0.0};
 
     // fopen opens the file; exits if file cannot be opened
-    if ((writePtr = fopen("accounts.txt", "w")) == NULL)
+    if ((writePtr = fopen(TEXT_FILE, "w")) == NULL)
     {
         puts("File could not be opened.");
     } // end if
@@ -94,12 +96,10 @@ void textFile(FILE *readPtr)
         fprintf(writePtr, "%-6s%-16s%-11s%10s\n", "Acct", "Last Name", "First Name", "Balance");
 
         // copy all records from random-access file into text file
-        while (!feof(readPtr))
+        while (fread(&client, sizeof(struct clientData), 1, readPtr) == 1)
         {
-            result = fread(&client, sizeof(struct clientData), 1, readPtr);
-
             // write single record to text file
-            if (result != 0 && client.acctNum != 0)
+            if (client.acctNum != 0)
             {
                 fprintf(writePtr, "%-6d%-16s%-11s%10.2f\n", client.acctNum, client.lastName, client.firstName,
                         client.balance);
