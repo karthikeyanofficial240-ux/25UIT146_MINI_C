@@ -3,6 +3,7 @@
 // be placed in the file, and deletes data previously in the file.
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MAX_RECORDS 100
 #define DATA_FILE "credit.dat"
@@ -20,6 +21,7 @@ struct clientData
 // prototypes
 unsigned int enterChoice(void);
 void textFile(FILE *readPtr);
+void printAllRecords(FILE *fPtr);
 void updateRecord(FILE *fPtr);
 void newRecord(FILE *fPtr);
 void deleteRecord(FILE *fPtr);
@@ -47,7 +49,7 @@ int main(int argc, char *argv[])
     }
 
     // enable user to specify action
-    while ((choice = enterChoice()) != 5)
+    while ((choice = enterChoice()) != 6)
     {
         switch (choice)
         {
@@ -55,16 +57,20 @@ int main(int argc, char *argv[])
         case 1:
             textFile(cfPtr);
             break;
-        // update record
+        // print all records to screen
         case 2:
+            printAllRecords(cfPtr);
+            break;
+        // update record
+        case 3:
             updateRecord(cfPtr);
             break;
         // create record
-        case 3:
+        case 4:
             newRecord(cfPtr);
             break;
         // delete existing record
-        case 4:
+        case 5:
             deleteRecord(cfPtr);
             break;
         // display if user does not select valid choice
@@ -109,6 +115,31 @@ void textFile(FILE *readPtr)
         fclose(writePtr); // fclose closes the file
     }                     // end else
 } // end function textFile
+
+// print all existing records to the screen
+void printAllRecords(FILE *fPtr)
+{
+    struct clientData client = {0, "", "", 0.0};
+    int found = 0;
+
+    rewind(fPtr); // sets pointer to beginning of file
+    printf("\n%-6s%-16s%-11s%10s\n", "Acct", "Last Name", "First Name", "Balance");
+    printf("%-6s%-16s%-11s%10s\n", "----", "---------", "----------", "-------");
+
+    while (fread(&client, sizeof(struct clientData), 1, fPtr) == 1)
+    {
+        if (client.acctNum != 0)
+        {
+            printf("%-6d%-16s%-11s%10.2f\n",
+                   client.acctNum, client.lastName,
+                   client.firstName, client.balance);
+            found = 1;
+        }
+    } // end while
+
+    if (!found)
+        puts("No records found.");
+} // end function printAllRecords
 
 // update balance in record
 void updateRecord(FILE *fPtr)
@@ -264,10 +295,11 @@ unsigned int enterChoice(void)
     printf("%s", "\nEnter your choice\n"
                  "1 - store a formatted text file of accounts called\n"
                  "    \"accounts.txt\" for printing\n"
-                 "2 - update an account\n"
-                 "3 - add a new account\n"
-                 "4 - delete an account\n"
-                 "5 - end program\n? ");
+                 "2 - view all accounts on screen\n"
+                 "3 - update an account\n"
+                 "4 - add a new account\n"
+                 "5 - delete an account\n"
+                 "6 - end program\n? ");
 
     if (scanf("%u", &menuChoice) != 1) {
         int c;
