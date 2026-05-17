@@ -113,6 +113,7 @@ void textFile(FILE *readPtr)
         }     // end while
 
         fclose(writePtr); // fclose closes the file
+        printf("Accounts saved to \"%s\".\n", TEXT_FILE);
     }                     // end else
 } // end function textFile
 
@@ -121,6 +122,7 @@ void printAllRecords(FILE *fPtr)
 {
     struct clientData client = {0, "", "", 0.0};
     int found = 0;
+    double total = 0.0;
 
     rewind(fPtr); // sets pointer to beginning of file
     printf("\n%-6s%-16s%-11s%10s\n", "Acct", "Last Name", "First Name", "Balance");
@@ -133,12 +135,15 @@ void printAllRecords(FILE *fPtr)
             printf("%-6d%-16s%-11s%10.2f\n",
                    client.acctNum, client.lastName,
                    client.firstName, client.balance);
+            total += client.balance;
             found = 1;
         }
     } // end while
 
     if (!found)
         puts("No records found.");
+    else
+        printf("%-33s%10.2f\n", "Total Balance:", total);
 } // end function printAllRecords
 
 // update balance in record
@@ -229,11 +234,22 @@ void deleteRecord(FILE *fPtr)
         printf("Account %u does not exist.\n", accountNum);
     } // end if
     else
-    { // delete record
-        // move file pointer to correct record in file
-        fseek(fPtr, (accountNum - 1) * sizeof(struct clientData), SEEK_SET);
-        // replace existing record with blank record
-        fwrite(&blankClient, sizeof(struct clientData), 1, fPtr);
+    { // confirm then delete record
+        printf("Delete account %u (%s %s)? (y/n): ",
+               client.acctNum, client.firstName, client.lastName);
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF); // flush newline from scanf
+        int confirm = getchar();
+        if (confirm == 'y' || confirm == 'Y')
+        {
+            // move file pointer to correct record in file
+            fseek(fPtr, (accountNum - 1) * sizeof(struct clientData), SEEK_SET);
+            // replace existing record with blank record
+            fwrite(&blankClient, sizeof(struct clientData), 1, fPtr);
+            printf("Account %u deleted.\n", accountNum);
+        }
+        else
+            puts("Deletion cancelled.");
     } // end else
 } // end function deleteRecord
 
