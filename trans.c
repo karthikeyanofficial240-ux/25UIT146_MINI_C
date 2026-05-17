@@ -3,6 +3,9 @@
 // be placed in the file, and deletes data previously in the file.
 #include <stdio.h>
 #include <stdlib.h>
+
+#define MAX_RECORDS 100
+
 // clientData structure definition
 struct clientData
 {
@@ -33,9 +36,9 @@ int main(int argc, char *argv[])
             exit(-1);
         }
         
-        // initialize file with 100 blank records
+        // initialize file with MAX_RECORDS blank records
         struct clientData blankClient = {0, "", "", 0.0};
-        for (unsigned int i = 1; i <= 100; ++i) {
+        for (unsigned int i = 1; i <= MAX_RECORDS; ++i) {
             fwrite(&blankClient, sizeof(struct clientData), 1, cfPtr);
         }
         rewind(cfPtr);
@@ -76,7 +79,7 @@ int main(int argc, char *argv[])
 void textFile(FILE *readPtr)
 {
     FILE *writePtr; // accounts.txt file pointer
-    int result;     // used to test whether fread read any bytes
+    size_t result;  // used to test whether fread read any bytes
     // create clientData with default information
     struct clientData client = {0, "", "", 0.0};
 
@@ -116,7 +119,7 @@ void updateRecord(FILE *fPtr)
     struct clientData client = {0, "", "", 0.0};
 
     // obtain number of account to update
-    printf("%s", "Enter account to update ( 1 - 100 ): ");
+    printf("Enter account to update ( 1 - %d ): ", MAX_RECORDS);
     if (scanf("%u", &account) != 1) {
         int c;
         while ((c = getchar()) != '\n' && c != EOF);
@@ -124,9 +127,9 @@ void updateRecord(FILE *fPtr)
         return;
     }
 
-    if (account < 1 || account > 100)
+    if (account < 1 || account > MAX_RECORDS)
     {
-        puts("Account number must be between 1 and 100.");
+        printf("Account number must be between 1 and %d.\n", MAX_RECORDS);
         return;
     }
 
@@ -171,7 +174,7 @@ void deleteRecord(FILE *fPtr)
     unsigned int accountNum;                        // account number
 
     // obtain number of account to delete
-    printf("%s", "Enter account number to delete ( 1 - 100 ): ");
+    printf("Enter account number to delete ( 1 - %d ): ", MAX_RECORDS);
     if (scanf("%u", &accountNum) != 1) {
         int c;
         while ((c = getchar()) != '\n' && c != EOF);
@@ -179,9 +182,9 @@ void deleteRecord(FILE *fPtr)
         return;
     }
 
-    if (accountNum < 1 || accountNum > 100)
+    if (accountNum < 1 || accountNum > MAX_RECORDS)
     {
-        puts("Account number must be between 1 and 100.");
+        printf("Account number must be between 1 and %d.\n", MAX_RECORDS);
         return;
     }
 
@@ -211,7 +214,7 @@ void newRecord(FILE *fPtr)
     unsigned int accountNum; // account number
 
     // obtain number of account to create
-    printf("%s", "Enter new account number ( 1 - 100 ): ");
+    printf("Enter new account number ( 1 - %d ): ", MAX_RECORDS);
     if (scanf("%u", &accountNum) != 1) {
         int c;
         while ((c = getchar()) != '\n' && c != EOF);
@@ -219,9 +222,9 @@ void newRecord(FILE *fPtr)
         return;
     }
 
-    if (accountNum < 1 || accountNum > 100)
+    if (accountNum < 1 || accountNum > MAX_RECORDS)
     {
-        puts("Account number must be between 1 and 100.");
+        printf("Account number must be between 1 and %d.\n", MAX_RECORDS);
         return;
     }
 
